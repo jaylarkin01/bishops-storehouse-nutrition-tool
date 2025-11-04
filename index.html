@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Bishop's Storehouse Checklist & Nutrition Tool</title>
+<style>
+body { font-family: Arial, sans-serif; margin: 20px; }
+h2 { margin-top: 30px; }
+.item { margin-bottom: 5px; }
+.item input[type="number"] { width: 40px; margin-left: 5px; }
+.member { margin-bottom: 10px; }
+button { margin: 5px 0; }
+#output { white-space: pre-wrap; border: 1px solid #ccc; padding: 10px; margin-top: 20px; }
+</style>
+</head>
+<body>
+
+<h1>Bishop's Storehouse Checklist & Nutrition Tool</h1>
+
+<label>Your Name: <input type="text" id="requesterName"></label>
+
+<h2>Household Members (up to 10)</h2>
+<div id="householdMembers"></div>
+<button onclick="addMember()">Add Member</button>
+
+<h2>Items</h2>
+
+<!-- CANNED MEATS -->
+<h3>CANNED MEATS</h3>
+<div class="item">Fully cooked beef (canned) 14.4 oz <input type="number" class="itemQty" value="0" min="0" data-calperlb="300"></div>
+<div class="item">Beef stew 14.4 oz <input type="number" class="itemQty" value="0" min="0" data-calperlb="350"></div>
+<div class="item">Chili 14.4 oz <input type="number" class="itemQty" value="0" min="0" data-calperlb="360"></div>
+<div class="item">Pork and beans 14.8 oz <input type="number" class="itemQty" value="0" min="0" data-calperlb="320"></div>
+<div class="item">Tuna 5 oz <input type="number" class="itemQty" value="0" min="0" data-calperlb="150"></div>
+<div class="item">Chicken breast pieces 12.5 oz <input type="number" class="itemQty" value="0" min="0" data-calperlb="400"></div>
+
+<!-- CANNED SOUPS -->
+<h3>CANNED SOUPS</h3>
+<div class="item">Chicken flavored rotini soup 14.4 oz <input type="number" class="itemQty" value="0" min="0" data-calperlb="250"></div>
+<div class="item">Cream of chicken soup 14.5 oz <input type="number" class="itemQty" value="0" min="0" data-calperlb="300"></div>
+<div class="item">Cream of mushroom soup 14.5 oz <input type="number" class="itemQty" value="0" min="0" data-calperlb="280"></div>
+<div class="item">Tomato soup 14.4 oz <input type="number" class="itemQty" value="0" min="0" data-calperlb="150"></div>
+
+<!-- CANNED FRUITS -->
+<h3>CANNED FRUITS</h3>
+<div class="item">Applesauce 26.5 oz <input type="number" class="itemQty" value="0" min="0" data-calperlb="200"></div>
+<div class="item">Peaches 29 oz <input type="number" class="itemQty" value="0" min="0" data-calperlb="220"></div>
+<div class="item">Pears 29 oz <input type="number" class="itemQty" value="0" min="0" data-calperlb="220"></div>
+
+<!-- CANNED VEGETABLES -->
+<h3>CANNED VEGETABLES</h3>
+<div class="item">Corn 14.4 oz <input type="number" class="itemQty" value="0" min="0" data-calperlb="120"></div>
+<div class="item">Green beans 14.4 oz <input type="number" class="itemQty" value="0" min="0" data-calperlb="50"></div>
+<div class="item">Spaghetti sauce 27.7 oz <input type="number" class="itemQty" value="0" min="0" data-calperlb="150"></div>
+<div class="item">Tomato sauce 14.4 oz <input type="number" class="itemQty" value="0" min="0" data-calperlb="50"></div>
+<div class="item">Diced tomatoes 28 oz <input type="number" class="itemQty" value="0" min="0" data-calperlb="100"></div>
+
+<!-- DRINKS -->
+<h3>DRINKS</h3>
+<div class="item">Hot cocoa 26 servings <input type="number" class="itemQty" value="0" min="0" data-calperlb="100"></div>
+<div class="item">Non-fat dry milk 27 servings <input type="number" class="itemQty" value="0" min="0" data-calperlb="80"></div>
+
+<!-- DESSERTS -->
+<h3>DESSERTS</h3>
+<div class="item">Strawberry gelatin 8 servings <input type="number" class="itemQty" value="0" min="0" data-calperlb="80"></div>
+<div class="item">Chocolate pudding 6 servings <input type="number" class="itemQty" value="0" min="0" data-calperlb="100"></div>
+<div class="item">Vanilla pudding 6 servings <input type="number" class="itemQty" value="0" min="0" data-calperlb="100"></div>
+<div class="item">Chocolate cake mix 18.2 oz <input type="number" class="itemQty" value="0" min="0" data-calperlb="900"></div>
+<div class="item">Yellow cake mix 18.2 oz <input type="number" class="itemQty" value="0" min="0" data-calperlb="900"></div>
+
+<!-- SEASONINGS -->
+<h3>SEASONINGS</h3>
+<div class="item">Cinnamon 2.37 oz <input type="number" class="itemQty" value="0" min="0" data-calperlb="20"></div>
+<div class="item">Black pepper 2.2 oz <input type="number" class="itemQty" value="0" min="0" data-calperlb="10"></div>
+<div class="item">Salt (iodized) 26 oz <input type="number" class="itemQty" value="0" min="0" data-calperlb="0"></div>
+<div class="item">Vanilla flavor 4 fl oz <input type="number" class="itemQty" value="0" min="0" data-calperlb="10"></div>
+
+<!-- Continue adding all remaining categories and items with the same pattern, assigning reasonable rough calorie estimates -->
+
+<button onclick="generateSummary()">Generate Summary</button>
+<button onclick="copyAndSMS()">Copy & SMS</button>
+<button onclick="clearAll()">Clear All</button>
+
+<div id="output"></div>
+
+<script>
+let memberCount = 0;
+
+function addMember() {
+  if(memberCount>=10){ alert("Maximum 10 members."); return; }
+  const div = document.createElement('div');
+  div.className = 'member';
+  div.innerHTML = `Member ${memberCount+1}: Age <input type="number" class="memberAge" value="30" min="0"> Gender 
+    <select class="memberGender">
+      <option value="male">Male</option>
+      <option value="female">Female</option>
+    </select>`;
+  document.getElementById('householdMembers').appendChild(div);
+  memberCount++;
+}
+
+document.querySelectorAll('.itemQty').forEach(input => {
+  input.addEventListener('focus', function(){ if(this.value==="0") this.value=""; });
+});
+
+function generateSummary() {
+  const name = document.getElementById('requesterName').value || "No Name";
+  let totalCaloriesNeeded = 0;
+  document.querySelectorAll('.member').forEach(mDiv => {
+    const age = parseInt(mDiv.querySelector('.memberAge').value) || 30;
+    const gender = mDiv.querySelector('.memberGender').value;
+    let cals = 0;
+    if(age<3) cals=1300;
+    else if(age<8) cals=1700;
+    else if(age<13) cals=2200;
+    else if(age<18) cals=2500;
+    else if(age<50) cals=gender==='male'?2500:2000;
+    else cals=gender==='male'?2300:1800;
+    totalCaloriesNeeded += cals;
+  });
+
+  const items = document.querySelectorAll('.item');
+  let summaryText = `${name}\n\nSelected Items:\n`;
+  let totalCaloriesSelected = 0;
+  items.forEach(i => {
+    const qtyInput = i.querySelector('.itemQty');
+    const qty = parseInt(qtyInput.value) || 0;
+    if(qty>0){
+      summaryText += `• ${i.childNodes[0].textContent.trim()} — ${qty}\n`;
+      const calPerLb = parseInt(qtyInput.dataset.calperlb) || 0;
+      totalCaloriesSelected += calPerLb * qty;
+    }
+  });
+
+  summaryText += `\nApprox. household calorie needs/day: ${totalCaloriesNeeded}\n`;
+  summaryText += `Approx. calories provided by selected items: ${totalCaloriesSelected}\n`;
+  summaryText += totalCaloriesSelected>=totalCaloriesNeeded ? "Sufficient food for one day." : "May not be enough for one day!";
+  
+  document.getElementById('output').textContent = summaryText;
+}
+
+function copyAndSMS() {
+  const outputText = document.getElementById('output').textContent;
+  if(!outputText){
+    alert("Please generate the summary first.");
+    return;
+  }
+
+  navigator.clipboard.writeText(outputText).then(() => {
+    alert("Summary copied to clipboard. Opening SMS app...");
+    const smsLink = document.createElement('a');
+    smsLink.href = `sms:?body=${encodeURIComponent(outputText)}`;
+    smsLink.click();
+  }).catch(err => {
+    alert("Could not copy to clipboard. Please copy manually.");
+    console.error(err);
+  });
+}
+
+function clearAll() {
+  document.getElementById('requesterName').value="";
+  document.getElementById('householdMembers').innerHTML="";
+  memberCount=0;
+  const qtys = document.querySelectorAll('.itemQty');
+  qtys.forEach(q=>q.value="0");
+  document.getElementById('output').textContent="";
+}
+</script>
+
+</body>
+</html>
